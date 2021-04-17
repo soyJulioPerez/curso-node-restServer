@@ -1,23 +1,33 @@
-const { response} = require('express');
+const { request, response } = require('express');
 
-const usuariosGet = (req, res = response) => {
+const usuariosGet = (req = request, res = response) => {
+  const {nombre, apikey, page = 1, limit = 10} = req.query;
   res.json({
     ok: true,
-    msg: 'get API - controlador'
+    msg: 'get API - controlador',
+    nombre,
+    apikey,
+    page,
+    limit
   });
 }
 
-const usuariosPut = ('/', (req, res) => {
+const usuariosPut = ('/', (req = request, res) => {
+  const id = req.params.id;
   res.json({
     ok: true,
-    msg: 'put - controlador'
+    msg: 'put - controlador',
+    id
   });
 });
 
 const usuariosPost = ('/', (req, res) => {
+  const { nombre, edad } = req.body;
   res.status(201).json({
     ok: true,
-    msg: 'post - controlador'
+    msg: 'post - controlador',
+    nombre,
+    edad
   });
 });
 
