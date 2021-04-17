@@ -23,7 +23,7 @@ const UsuarioSchema = Schema({
     type: String,
   },
   estado: {
-    type: Boolena,
+    type: Boolean,
     default: true
   },
   google: {
