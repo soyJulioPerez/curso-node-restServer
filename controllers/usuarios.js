@@ -10,12 +10,10 @@ const usuariosGet = async(req = request, res = response) => {
     const usuariosPromise = Usuario.find(query)
       .skip(Number(desde))
       .limit(Number(limite));
-    // const totalPromise = Usuario.count(query);
+    const totalPromise = Usuario.count(query);
 
-    // const [total, usuarios] = await Promise.all([totalPromise, usuariosPromise]);
-    const usuarios = await usuariosPromise;
-    // res.json({total, usuarios});
-    res.json(usuarios);
+    const [total, usuarios] = await Promise.all([totalPromise, usuariosPromise]);
+    res.json({total, usuarios});
   } catch (error) {
     console.log(error);
   }
