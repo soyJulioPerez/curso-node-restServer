@@ -27,7 +27,8 @@ const usuariosPut = ('/', (req = request, res) => {
 const usuariosPost = async (req, res) => {
   const {nombre, correo, password, rol} = req.body;
   const usuario = new Usuario({nombre, correo, password, rol});
-  // verificar si la contraseña existe
+
+  // verificar si el email existe
   const existeEmail = await Usuario.findOne({ correo });
   if (existeEmail) {
     return res.status(404).json({
