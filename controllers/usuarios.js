@@ -15,15 +15,6 @@ const usuariosGet = (req = request, res = response) => {
   });
 }
 
-const usuariosPut = ('/', (req = request, res) => {
-  const id = req.params.id;
-  res.json({
-    ok: true,
-    msg: 'put - controlador',
-    id
-  });
-});
-
 const usuariosPost = async (req, res) => {
   const {nombre, correo, password, rol} = req.body;
   const usuario = new Usuario({nombre, correo, password, rol});
@@ -42,19 +33,40 @@ const usuariosPost = async (req, res) => {
   });
 }
 
-const usuariosDelete = ('/', (req, res) => {
+const usuariosPut = async (req = request, res = response) => {
+  const { id } = req.params;
+  const { _id, password, google, correo, ...usuarioData } = req.body;
+
+  // TODO validar contra BD
+
+  if (password) {
+    // Encriptar la contraseña
+    const salt = bcrypt.genSaltSync();
+    usuarioData.password = bcrypt.hashSync(password, salt);
+  }
+
+  const usuario = await Usuario.findByIdAndUpdate(id, usuarioData);
+
+  res.json({
+    ok: true,
+    msg: 'put - controlador',
+    usuario
+  });
+};
+
+const usuariosDelete = (req, res) => {
   res.json({
     ok: true,
     msg: 'delete - controlador'
   });
-});
+};
 
-const usuariosPatch = ('/', (req, res) => {
+const usuariosPatch = (req, res) => {
   res.json({
     ok: true,
     msg: 'patch - controlador'
   });
-});
+};
 
 module.exports = {
   usuariosGet, usuariosPost, usuariosPut, usuariosDelete, usuariosPatch
