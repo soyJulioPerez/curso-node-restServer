@@ -16,6 +16,9 @@
   <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
   <a href="#" onclick="signOut();">Sign out</a>
   <script>
+    var url = ( window.location.hostname.includes('localhost'))
+              ? 'http://localhost:3002/api/auth/google'
+              : 'http://localhost:3002/api/auth/google/api/auth/google'
     function onSignIn(googleUser) {
       // Useful data for your client-side scripts:
       var profile = googleUser.getBasicProfile();
@@ -27,8 +30,16 @@
       console.log("Email: " + profile.getEmail());
 
       // The ID token you need to pass to your backend:
-      var id_token = googleUser.getAuthResponse().id_token;
-      console.log("ID Token: " + id_token);
+      const id_token = googleUser.getAuthResponse().id_token;
+      const data = { id_token };
+      fetch( url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then( res => res.json())
+      .then( data => console.log('Nuestro server', data))
+      .catch(console.log);
     }
 
     function signOut() {
