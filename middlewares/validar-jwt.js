@@ -6,7 +6,7 @@ const validarJWT = async(req = request, res = response, next) => {
   const token = req.header('x-token');
   if (!token) {
     return res.status(401).json({
-      msg: 'Token NO valido - No hay'
+      msg: 'Token NO valido - No hay token'
     });
   }
 
