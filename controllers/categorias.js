@@ -7,11 +7,13 @@ const query = { estado: true };
 const obtenerCategorias = async(req = request, res = response) => {
   const { desde = 0, limite = 0 } = req.query;
   try {
-    const categorias = await Categoria.find(query)
-      .populate('usuario')
+    const categoriasPromise = await Categoria.find(query)
+      .populate('usuario', 'nombre')
       .skip(Number(desde))
       .limit(Number(limite));
-    return res.json({ categorias });
+    const totalPromise = Categoria.countDocuments(query);
+    const [total, categorias] = await Promise.all([totalPromise, categoriasPromise]);
+    return res.json({ total, desde, limite, categorias });
 
   } catch (error) {
     console.debug(error);
@@ -25,12 +27,12 @@ const obtenerCategorias = async(req = request, res = response) => {
 const obtenerCategoria = async(req = request, res = response) => {
   try {
     const id = req.params.id;
-    const categoria =  await Categoria.findById(id).populate('usuario');
+    const categoria =  await Categoria.findById(id).populate('usuario', 'nombre');
     return res.json({ categoria });
   } catch (error) {
     console.debug(error);
     res.status(500).json({
-      msg: 'Error consultando categoría'
+      msg: 'Error buscando categoría'
     });
   }
 }
@@ -59,10 +61,10 @@ const actualizarCategoria = async(req = request, res = response) => {
   try {
     const id = req.params.id;
     const categoriaData = {
-      nombre: req.body.nombre,
+      nombre: req.body.nombre.toUpperCase(),
       usuario: req.usuario._id
     }
-    const categoria = await Categoria.findByIdAndUpdate(id, categoriaData);
+    const categoria = await Categoria.findByIdAndUpdate(id, categoriaData, {new: true});
     return res.json(categoria);
   } catch (error) {
     console.log(error);
@@ -79,7 +81,7 @@ const borrarCategoria = async(req = request, res = response) => {
     res.json({categoria});
   } catch (error) {
     res.status(500).json({
-      msg: 'Error actualizando categoría'
+      msg: 'Error borrando categoría'
     });
   }
 

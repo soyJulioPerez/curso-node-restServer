@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { login, googleLogin } = require('../controllers/auth');
 
 const { validarJWT, validarCampos, esAdminRole } =require('../middlewares');
 const { obtenerCategorias, obtenerCategoria, crearCategoria, actualizarCategoria, borrarCategoria } = require('../controllers/categorias');
