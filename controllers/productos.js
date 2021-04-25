@@ -8,12 +8,12 @@ const consultarProductos = async(req = request, res = response) => {
     const productosPromise = Producto.find(query)
       .skip(Number(desde))
       .limit(Number(limite))
-      .populate('categoria');
+      .populate('usuario','nombre')
+      .populate('categoria','nombre');
     const totalPromise = Producto.countDocuments(query);
     const [total, productos] = await Promise.all([totalPromise, productosPromise]);
     res.json({ total, productos});
   } catch (error) {
-    console.log('🚀 ~ consultarProductos ~ error', error);
     return res.json({
       msg: 'CONSULTAR productos ',
       error
@@ -25,13 +25,16 @@ const consultarProductos = async(req = request, res = response) => {
 const consultarProducto = async(req = request, res = response) => {
   try {
     const { id } = req.params;
-    producto = await Producto.findById(id).populate('categoria');
+    producto = await Producto.findById(id)
+      .populate('categoria', 'nombre')
+      .populate('usuario', 'nombre');
     return res.json({ producto });
 
   } catch (error) {
     console.log(error);
     return res.json({
-      msg: 'BUSCAR producto'
+      msg: 'BUSCAR producto',
+      error
     });
 
   }
@@ -40,13 +43,19 @@ const consultarProducto = async(req = request, res = response) => {
 
 const crearProducto = async(req = request, res = response) => {
   try {
-    const usuario = req.usuario._id;
-    const { nombre, precio, categoria, descripcion, disponible } = req.body;
-    const producto = new Producto({
-      nombre, precio, categoria, descripcion, disponible, usuario
-    });
+    const { estado, usuario, ...body } = req.body;
+    const productoDB = await Producto.findOne({ nombre: body.nombre});
+    if (productoDB) {
+      return res.status(400).json({
+        msg: `Ya existe un producto con ese nombre ${nombre}`
+      });
+    }
+
+    const producto = new Producto({ ... body, usuario: req.usuario._id });
     await producto.save();
-    res.status(201).json({ producto });
+    res.status(201).json({
+      producto
+    });
   } catch (error) {
     console.log('🚀 ~ crearProducto ~ error', error);
     return res.json({
