@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
 
 const { dbConnection } = require('../database/config');
 
@@ -12,7 +13,8 @@ class Server {
       usuarios: '/api/usuarios',
       categorias: '/api/categorias',
       buscar: '/api/buscar',
-      productos: '/api/productos'
+      productos: '/api/productos',
+      uploads: '/api/uploads'
     }
 
     // Conectar a BD
@@ -29,9 +31,16 @@ class Server {
   }
 
   middlewares() {
-    this.app.use(cors())         // CORS
+    this.app.use(cors())              // CORS
     this.app.use(express.json());     // Parseo y lectura del body
     this.app.use( express.static('public'));
+
+    // Fileuploas - Carga de archivos
+    this.app.use( fileUpload({
+      useTempFiles : true,
+      tempFileDir : '/tmp/',
+      createParentPath: true
+    }));
   }
 
   routes() {
@@ -40,6 +49,7 @@ class Server {
     this.app.use(this.paths.categorias, require('../routes/categorias'));
     this.app.use(this.paths.productos, require('../routes/productos'));
     this.app.use(this.paths.buscar, require('../routes/buscar'));
+    this.app.use(this.paths.uploads, require('../routes/uploads'));
   }
 
   listen() {
